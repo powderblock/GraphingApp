@@ -13,7 +13,7 @@
 
 using namespace std;
 
-const int width = 640, height = 480;
+const int width = 1280, height = 720;
 const int FPS = 60;
 bool running = true;
 
@@ -22,7 +22,6 @@ Uint32 start;
 void events();
 void lockFPS();
 void init();
-void update();
 void render();
 
 struct point {
@@ -38,24 +37,27 @@ float maxHeight, maxWidth;
 
 int main(int argc, char* argv[]){
 	SDL_Init(SDL_INIT_VIDEO);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_Surface *screen = SDL_SetVideoMode(width, height, 32, SDL_OPENGL | SDL_HWSURFACE);
 	SDL_WM_SetCaption("Graph", NULL);
 
 	FILE * pFile;
 	if(argc < 2){
-		cout << "Error: Improper usage! Please enter the name of the application, followed by the name of the data you wish to read." << endl;
+		fprintf(stderr, "Error: no arguments given. \nUsage: %s file [file] [file] ...", argv[0]);
+		exit(1);
 	}
 	for(int i = 1; i < argc; ++i){
 		int x = 0;
 		pFile = fopen(argv[i],"r");
 		if(pFile == NULL){
-			perror ("Error opening file");
+			fprintf(stderr ,"Error opening file %s", argv[i]);
 		}
 
 		do {
 			status = fscanf(pFile, "%f", &floatBeingSearchedFor);
 			if(status == 0){
-				cerr << "Error reading file." << endl;
+				fprintf(stderr, "Error reading file %s.", argv[i]);
 			}
 
 			if(floatBeingSearchedFor > maxHeight){
@@ -65,7 +67,6 @@ int main(int argc, char* argv[]){
 			points.push_back(point(x, floatBeingSearchedFor));
 			x += 1;
 		} while(status != EOF);
-		cout << points.size() << " points so far." << endl;
 
 		fclose(pFile);
 	}
@@ -83,8 +84,12 @@ int main(int argc, char* argv[]){
 	init();
 
 	while(running){
-		update();
+		start = SDL_GetTicks();
+		events();
+		render();
+		lockFPS();
 	}
+	SDL_Quit();
 	return 0;
 }
 
@@ -102,19 +107,15 @@ void init(){
 	glLoadIdentity();
 }
 
-void update(){
-	start = SDL_GetTicks();
-	events();
-	render();
-	lockFPS();
-}
-
 void events(){
 	SDL_Event event;
 	while(SDL_PollEvent(&event)){
 		switch(event.type){
 			case SDL_QUIT:
 				running = false;
+				break;
+			case SDL_KEYDOWN:
+				if (event.key.keysym.sym == SDLK_ESCAPE) running = false;
 				break;
 		}
 	}
@@ -123,8 +124,11 @@ void events(){
 void render(){
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glBegin(GL_LINE_STRIP);
-		for(int i = 0; i < points.size(); ++i){
+	glLineWidth(2);
+	glBegin(GL_LINES);
+		for(int i = 1; i < points.size(); ++i){
+			if (points[i].x < points[i-1].x) continue; // Skip the line if it's moving backwards.
+			glVertex2f(points[i-1].x, points[i-1].y);
 			glVertex2f(points[i].x, points[i].y);
 		}
 	glEnd();
