@@ -25,11 +25,16 @@ void init();
 void update();
 void render();
 
-vector<float> points;
+struct point {
+	int x, y;
+	point(int x, int y) : x(x), y(y) {}
+};
+
+vector<point> points;
 
 int status;
 float floatBeingSearchedFor;
-float maxPoint;
+float maxHeight, maxWidth;
 
 int main(int argc, char* argv[]){
 	SDL_Init(SDL_INIT_VIDEO);
@@ -40,8 +45,8 @@ int main(int argc, char* argv[]){
 	if(argc < 2){
 		cout << "Error: Improper usage! Please enter the name of the application, followed by the name of the data you wish to read." << endl;
 	}
-	for(int i = 1; i < argc; i++){
-		cout << argv[i] << endl;
+	for(int i = 1; i < argc; ++i){
+		int x = 0;
 		pFile = fopen(argv[i],"r");
 		if(pFile == NULL){
 			perror ("Error opening file");
@@ -52,18 +57,29 @@ int main(int argc, char* argv[]){
 			if(status == 0){
 				cerr << "Error reading file." << endl;
 			}
-			points.push_back(floatBeingSearchedFor);
-			if(floatBeingSearchedFor > maxPoint){
-				maxPoint = floatBeingSearchedFor;
+
+			if(floatBeingSearchedFor > maxHeight){
+				maxHeight = floatBeingSearchedFor;
 			}
+			
+			points.push_back(point(x, floatBeingSearchedFor));
+			x += 1;
 		} while(status != EOF);
 		cout << points.size() << " points so far." << endl;
 
 		fclose(pFile);
 	}
+	
+	for(int i = 0; i < points.size(); ++i){
+		if(points[i].x > maxWidth){
+			maxWidth = points[i].x;
+		}
+	}
 
 	cout << "Finished reading opened file(s)." << endl;
 	cout << "Points length is set to: " << points.size() << endl;
+	cout << "Max height for points is set to: " << maxHeight << endl;
+	cout << "Max width for points is set to: " << maxWidth << endl;
 	init();
 
 	while(running){
@@ -81,7 +97,7 @@ void lockFPS(){
 void init(){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, points.size(), 0, maxPoint * 1.1, 0, 1);
+	glOrtho(0, maxWidth * 1.01, 0, maxHeight * 1.01, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -109,7 +125,7 @@ void render(){
 
 	glBegin(GL_LINE_STRIP);
 		for(int i = 0; i < points.size(); ++i){
-			glVertex2f(i, points[i]);
+			glVertex2f(points[i].x, points[i].y);
 		}
 	glEnd();
 
