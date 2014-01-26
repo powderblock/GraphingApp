@@ -13,7 +13,7 @@
 
 using namespace std;
 
-const int width = 1280, height = 720;
+const int width = 640, height = 480;
 const int FPS = 60;
 bool running = true;
 
@@ -115,8 +115,11 @@ void events(){
 				running = false;
 				break;
 			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE) running = false;
-				break;
+				switch (event.key.keysym.sym){
+					case SDLK_ESCAPE:
+						running = false;
+						break;
+				}
 		}
 	}
 }
@@ -127,8 +130,8 @@ void render(){
 	glLineWidth(2);
 	glBegin(GL_LINES);
 		for(int i = 1; i < points.size(); ++i){
-			if (points[i].x < points[i-1].x) continue; // Skip the line if it's moving backwards.
-			glVertex2f(points[i-1].x, points[i-1].y);
+			if(points[i].x < points[i - 1].x) continue; // Skip the line if it's moving backwards.
+			glVertex2f(points[i - 1].x, points[i - 1].y);
 			glVertex2f(points[i].x, points[i].y);
 		}
 	glEnd();
