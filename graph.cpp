@@ -43,32 +43,34 @@ int main(int argc, char* argv[]){
 	if(argc < 2){
 		cout << "Error: Improper usage! Please enter the name of the application, followed by the name of the data you wish to read." << endl;
 	}
-
-	pFile=fopen (argv[1],"r");
-	if(pFile==NULL){
-		perror ("Error opening file");
-	}
-
-	while(status != EOF){
-		status = fscanf(pFile, "%f", &floatBeingSearchedFor);
-		points.push_back(floatBeingSearchedFor);
-		if(floatBeingSearchedFor > maxPoint){
-			maxPoint = floatBeingSearchedFor;
+	for(int i = 1; i < argc; i++){
+		cout << argv[i] << endl;
+		pFile = fopen(argv[i],"r");
+		if(pFile == NULL){
+			perror ("Error opening file");
 		}
-		if(status == 0){
-			cout << "Error reading file." << endl;
+
+		while(status != EOF){
+			status = fscanf(pFile, "%f", &floatBeingSearchedFor);
+			points.push_back(floatBeingSearchedFor);
+			if(floatBeingSearchedFor > maxPoint){
+				maxPoint = floatBeingSearchedFor;
+			}
+			if(status == 0){
+				cout << "Error reading file." << endl;
+			}
 		}
+
+		fclose(pFile);
 	}
 
-	fclose (pFile);
+	cout << "Finished reading opened file(s)." << endl;
 
-	cout << "Finished reading opened file." << endl;
-
-	for(int i = 0; i < points.size(); ++i){
-		cout << points[i] << endl;
-	}
+	//for(int i = 0; i < points.size(); ++i){
+		//cout << points[i] << endl;
+	//}
 	//cout << "Max point is set to: " << maxPoint << endl;
-	//cout << "Points length is set to: " << points.size() << endl;
+	cout << "Points length is set to: " << points.size() << endl;
 	init();
 
 	while(running){
