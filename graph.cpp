@@ -3,6 +3,7 @@
 #ifdef	_WIN32
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
+#undef main
 #else
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -39,7 +40,11 @@ int main(int argc, char* argv[]){
 	SDL_WM_SetCaption("Graph", NULL);
 
 	FILE * pFile;
-	pFile=fopen ("data.txt","r");
+	if(argc < 2){
+		cout << "Error: Improper usage! Please enter the name of the application, followed by the name of the data you wish to read." << endl;
+	}
+
+	pFile=fopen (argv[1],"r");
 	if(pFile==NULL){
 		perror ("Error opening file");
 	}
@@ -83,7 +88,7 @@ void init(){
 	glLoadIdentity();
 	cout << "Max point is set to: " << maxPoint << endl;
 	cout << "Points length is set to: " << points.size() << endl;
-	glOrtho(0, points.size(), 0, maxPoint, 0, 1);
+	glOrtho(0, points.size(), 0, maxPoint * 1.1, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
