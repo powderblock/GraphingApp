@@ -1,5 +1,7 @@
 #include <iostream>
 #include <stdio.h>
+#include <vector>
+
 #ifdef	_WIN32
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
@@ -8,14 +10,11 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #endif
-#include <vector>
 
 using namespace std;
 
 const int width = 640, height = 480;
-
 const int FPS = 60;
-
 bool running = true;
 
 Uint32 start;
@@ -29,9 +28,7 @@ void render();
 vector<float> points;
 
 int status;
-
 float floatBeingSearchedFor;
-
 float maxPoint;
 
 int main(int argc, char* argv[]){
@@ -50,26 +47,22 @@ int main(int argc, char* argv[]){
 			perror ("Error opening file");
 		}
 
-		while(status != EOF){
+		do {
 			status = fscanf(pFile, "%f", &floatBeingSearchedFor);
+			if(status == 0){
+				cerr << "Error reading file." << endl;
+			}
 			points.push_back(floatBeingSearchedFor);
 			if(floatBeingSearchedFor > maxPoint){
 				maxPoint = floatBeingSearchedFor;
 			}
-			if(status == 0){
-				cout << "Error reading file." << endl;
-			}
-		}
+		} while(status != EOF);
+		cout << points.size() << " points so far." << endl;
 
 		fclose(pFile);
 	}
 
 	cout << "Finished reading opened file(s)." << endl;
-
-	//for(int i = 0; i < points.size(); ++i){
-		//cout << points[i] << endl;
-	//}
-	//cout << "Max point is set to: " << maxPoint << endl;
 	cout << "Points length is set to: " << points.size() << endl;
 	init();
 
@@ -88,8 +81,6 @@ void lockFPS(){
 void init(){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	cout << "Max point is set to: " << maxPoint << endl;
-	cout << "Points length is set to: " << points.size() << endl;
 	glOrtho(0, points.size(), 0, maxPoint * 1.1, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
