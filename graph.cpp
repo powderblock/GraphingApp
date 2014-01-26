@@ -25,8 +25,8 @@ void init();
 void render();
 
 struct point {
-	int x, y;
-	point(int x, int y) : x(x), y(y) {}
+	float x, y;
+	point(float x, float y) : x(x), y(y) { }
 };
 
 vector<point> points;
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 	for(int i = 1; i < argc; ++i){
-		int x = 0;
+		float x = 0;
 		pFile = fopen(argv[i],"r");
 		if(pFile == NULL){
 			fprintf(stderr ,"Error opening file %s", argv[i]);
