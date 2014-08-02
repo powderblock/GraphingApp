@@ -1,4 +1,4 @@
 GraphingApp
 ===========
 
-An experimentally application for graphing data.
+An experimental application for graphing data.
